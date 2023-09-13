@@ -977,9 +977,9 @@
 					],
 					"sinks": [
 						{
-							"dataset": {
-								"referenceName": "Parquetdataflow",
-								"type": "DatasetReference"
+							"linkedService": {
+								"referenceName": "adlslinkservice",
+								"type": "LinkedServiceReference"
 							},
 							"name": "sink1"
 						}
@@ -1000,6 +1000,8 @@
 						"source1 sink(allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     format: 'parquet',",
+						"     fileSystem: 'adhoc',",
+						"     folderPath: 'duplicatedata',",
 						"     umask: 0022,",
 						"     preCommands: [],",
 						"     postCommands: [],",
@@ -1010,7 +1012,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/AzureSqlTableCDC')]",
-				"[concat(variables('factoryId'), '/datasets/Parquetdataflow')]"
+				"[concat(variables('factoryId'), '/linkedServices/adlslinkservice')]"
 			]
 		}
 	]
