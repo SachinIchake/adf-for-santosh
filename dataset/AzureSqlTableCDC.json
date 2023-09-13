@@ -1,0 +1,26 @@
+{
+	"name": "AzureSqlTableCDC",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sqldblink",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "FirstName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "MiddleName",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "SalesLT",
+			"table": "HasDuplicateData"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
