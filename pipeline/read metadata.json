@@ -29,7 +29,7 @@
 				}
 			},
 			{
-				"name": "Set variable1",
+				"name": "Set variable",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
