@@ -1,0 +1,9 @@
+{
+	"name": "adf-for-icrm",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "8ff8e8e2-8607-4d27-a392-340be86dc357",
+		"tenantId": "16b3c013-d300-468d-ac64-7eda0820b6d3"
+	}
+}

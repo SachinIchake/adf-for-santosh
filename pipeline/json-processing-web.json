@@ -1,0 +1,168 @@
+{
+	"name": "json-processing-web",
+	"properties": {
+		"activities": [
+			{
+				"name": "Web1",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": "https://datausa.io/api/data?drilldowns=Nation&measures=Population"
+				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Web1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "jsonData",
+					"value": {
+						"value": "@string(activity('Web1').output)",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Copy data to storage",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "DECLARE @json NVARCHAR(MAX);  \nSET @json = N'@{variables('jsondata')}';  \n\nSELECT *\nFROM OPENJSON(@json, N'$.data') \nWITH ( \nId_Nation NVARCHAR(MAX) N'$.\"ID Nation\"',\nNation NVARCHAR(MAX) N'$.Nation' ,\nID_Year NVARCHAR(MAX) N'$.\"ID Year\"',\nYear NVARCHAR(MAX)  N'$.Year',\nPopulation  NVARCHAR(MAX) N'$.Population' as JSON,\nSlug_Nation NVARCHAR(MAX) N'$.\"Slug Nation\"'\n) \n; ",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "JsonSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "JsonWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "AzureSqlds",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "icrmjsonds",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Copy data to sql",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "DECLARE @json NVARCHAR(MAX);  \nSET @json = N'@{variables('jsondata')}';  \n\nSELECT *\nFROM OPENJSON(@json, N'$.data') \nWITH ( \nId_Nation NVARCHAR(MAX) N'$.\"ID Nation\"',\nNation NVARCHAR(MAX) N'$.Nation' ,\nID_Year NVARCHAR(MAX) N'$.\"ID Year\"',\nYear NVARCHAR(MAX)  N'$.Year',\nPopulation  NVARCHAR(MAX) N'$.Population' as JSON,\nSlug_Nation NVARCHAR(MAX) N'$.\"Slug Nation\"'\n) \n; ",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"tableOption": "autoCreate",
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "AzureSqlds",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "AzureSqlTableDF",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"variables": {
+			"jsonData": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-03-07T09:40:25Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
