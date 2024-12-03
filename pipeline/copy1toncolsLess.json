@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "copy1toncolsLess",
+				"name": "copy1toncols",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
